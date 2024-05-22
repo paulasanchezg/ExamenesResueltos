@@ -173,15 +173,6 @@ const [initialRestaurantValues, setInitialRestaurantValues] = useState({ name: n
                 name='phone'
                 label='Phone:'
               />
-              { /* SOLUCION */ }
-              <InputItem
-                name='discountCode'
-                label='Discount Code:'
-              />
-              <InputItem
-                name='discount'
-                label='Discount:'
-              />
 
               <DropDownPicker
                 open={open}
@@ -198,6 +189,16 @@ const [initialRestaurantValues, setInitialRestaurantValues] = useState({ name: n
                 dropDownStyle={{ backgroundColor: '#fafafa' }}
               />
               <ErrorMessage name={'restaurantCategoryId'} render={msg => <TextError>{msg}</TextError> }/>
+
+              { /* SOLUCION */ }
+              <InputItem
+                name='discountCode'
+                label='Discount Code:'
+              />
+              <InputItem
+                name='discount'
+                label='Discount:'
+              />
 
               {/* SOLUCION */}
              <Pressable

@@ -197,15 +197,6 @@ export default function EditRestaurantScreen ({ navigation, route }) {
                 name='phone'
                 label='Phone:'
               />
-              { /* SOLUCION */ }
-              <InputItem
-                name='discountCode'
-                label='Discount Code:'
-              />
-              <InputItem
-                name='discount'
-                label='Discount:'
-              />
 
               <DropDownPicker
                 open={open}
@@ -222,6 +213,16 @@ export default function EditRestaurantScreen ({ navigation, route }) {
                 dropDownStyle={{ backgroundColor: '#fafafa' }}
               />
               <ErrorMessage name={'restaurantCategoryId'} render={msg => <TextError>{msg}</TextError> }/>
+
+              { /* SOLUCION */ }
+              <InputItem
+                name='discountCode'
+                label='Discount Code:'
+              />
+              <InputItem
+                name='discount'
+                label='Discount:'
+              />
 
               <Pressable onPress={() =>
                 pickImage(
