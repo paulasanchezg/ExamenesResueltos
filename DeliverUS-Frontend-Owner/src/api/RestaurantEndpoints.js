@@ -28,4 +28,9 @@ function promote (id) {
   return patch(`restaurants/${id}`)
 }
 
-export { getAll, getDetail, getRestaurantCategories, create, update, remove, promote }
+// SOLUCION
+function createCategory (data) {
+  return post('restaurantCategories', data)
+}
+
+export { getAll, getDetail, getRestaurantCategories, create, update, remove, promote, createCategory }
