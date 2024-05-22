@@ -50,10 +50,25 @@ const create = async function (req, res) {
   }
 }
 
+// SOLUCION
 const show = async function (req, res) {
-  // Only returns PUBLIC information of restaurants
-  try {
-    const restaurant = await Restaurant.findByPk(req.params.restaurantId, {
+   // Only returns PUBLIC information of restaurants
+   try {
+    let restaurant = await Restaurant.findByPk(req.params.restaurantId)
+
+    // La función verifica si el restaurante tiene una propiedad sortByPrice.
+    // Si es true, ordena los productos por su precio en orden ascendente ('price', 'ASC').
+    // Si es false o no está presente, se ordenan los productos por un atributo order en orden ascendente ('order', 'ASC').
+    const orderBy = restaurant.sortByPrice ? 
+      [[{ model: Product, as: 'products' }, 'price', 'ASC']]
+      : [[{ model: Product, as: 'products' }, 'order', 'ASC']]
+
+    // Se vuelve a buscar el restaurante con findByPk, pero esta vez incluyendo relaciones y configurando el orden de los productos.
+    restaurant = await Restaurant.findByPk(req.params.restaurantId, {
+      // include especifica las asociaciones a incluir en los resultados: 
+      // - Los productos (Product) asociados con el restaurante, incluyendo la categoría de producto (ProductCategory). 
+      // - La categoría del restaurante (RestaurantCategory).
+      // order aplica el criterio de ordenamiento determinado anteriormente.
       attributes: { exclude: ['userId'] },
       include: [{
         model: Product,
@@ -64,7 +79,7 @@ const show = async function (req, res) {
         model: RestaurantCategory,
         as: 'restaurantCategory'
       }],
-      order: [[{ model: Product, as: 'products' }, 'order', 'ASC']]
+      order: orderBy
     }
     )
     res.json(restaurant)
@@ -72,6 +87,19 @@ const show = async function (req, res) {
     res.status(500).send(err)
   }
 }
+
+// SOLUCION
+const toggleProductsSorting = async function (req, res) {
+  try {
+    const restaurant = await Restaurant.findByPk(req.params.restaurantId)
+    restaurant.sortByPrice = !restaurant.sortByPrice
+    await restaurant.save()
+    res.json(restaurant)
+  } catch (err) {
+    res.status(500).send(err)
+  }
+}
+
 
 const update = async function (req, res) {
   try {
@@ -132,6 +160,7 @@ const RestaurantController = {
   show,
   update,
   destroy,
-  promote
+  promote,
+  toggleProductsSorting
 }
 export default RestaurantController

@@ -61,6 +61,11 @@ module.exports = {
         type: Sequelize.BOOLEAN,
         defaultValue: false
       },
+      // SOLUCION
+      sortByPrice: {
+        type: Sequelize.BOOLEAN,
+        defaultValue: false
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

@@ -64,6 +64,11 @@ const loadModel = (sequelize, DataTypes) => {
       type: DataTypes.BOOLEAN,
       defaultValue: false
     },
+    // SOLUCION
+    sortByPrice: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
+    },
     restaurantCategoryId: {
       allowNull: false,
       type: DataTypes.INTEGER

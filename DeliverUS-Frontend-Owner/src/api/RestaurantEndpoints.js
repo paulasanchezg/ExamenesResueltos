@@ -33,4 +33,9 @@ function createCategory (data) {
   return post('restaurantCategories', data)
 }
 
-export { getAll, getDetail, getRestaurantCategories, create, update, remove, promote, createCategory }
+// SOLUCION
+function toggleProductsSorting (id) {
+  return patch(`restaurants/${id}/toggleProductsSorting`)
+}
+
+export { getAll, getDetail, getRestaurantCategories, create, update, remove, promote, createCategory, toggleProductsSorting }

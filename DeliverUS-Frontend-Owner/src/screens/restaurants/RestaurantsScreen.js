@@ -3,8 +3,7 @@ import React, { useContext, useEffect, useState } from 'react'
 import { StyleSheet, FlatList, Pressable, View } from 'react-native'
 
 // SOLUCION
-import { getAll, remove, promote } from '../../api/RestaurantEndpoints'
-// SOLUCION
+import { getAll, remove, promote, toggleProductsSorting } from '../../api/RestaurantEndpoints'
 import ConfirmationModal from '../../components/ConfirmationModal'
 import ImageCard from '../../components/ImageCard'
 import TextSemiBold from '../../components/TextSemibold'
@@ -45,16 +44,10 @@ export default function RestaurantsScreen ({ navigation, route }) {
         {item.averageServiceMinutes !== null &&
           <TextSemiBold>Avg. service time: <TextSemiBold textStyle={{ color: GlobalStyles.brandPrimary }}>{item.averageServiceMinutes} min.</TextSemiBold></TextSemiBold>
         }
+        <TextSemiBold>Shipping: <TextSemiBold textStyle={{ color: GlobalStyles.brandPrimary }}>{item.shippingCosts.toFixed(2)}€</TextSemiBold></TextSemiBold>
 
-        {/* SOLUCION */}
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end' }} >
-          <TextSemiBold>Shipping: <TextSemiBold textStyle={{ color: GlobalStyles.brandPrimary }}>{item.shippingCosts.toFixed(2)}€</TextSemiBold></TextSemiBold>
-          { item.promoted &&
-              <TextRegular textStyle={[styles.badge, { color: GlobalStyles.brandPrimary, borderColor: GlobalStyles.brandSuccess }]}>
-                ¡En promoción!
-              </TextRegular>
-          }
-        </View>
+        { /* SOLUCION */}
+        <TextRegular textStyle={{ textAlign: 'right' }}>Currently sorting products<TextSemiBold> by {item.sortByPrice ? 'price' : 'default'}</TextSemiBold></TextRegular>
 
         <View style={styles.actionButtonsContainer}>
           <Pressable
@@ -96,26 +89,47 @@ export default function RestaurantsScreen ({ navigation, route }) {
 
         {/* SOLUCION */}
         <Pressable
-            onPress={() => { setRestaurantToBePromoted(item) }}
-            style={({ pressed }) => [
+            onPress={ async () => await toggleRestaurantProductsOrder(item) }
+            style={() => [
               {
-                backgroundColor: pressed
-                  ? GlobalStyles.brandSuccessTap
+                backgroundColor: item.sortByPrice
+                  ? GlobalStyles.brandSuccessDisabled
                   : GlobalStyles.brandSuccess
               },
               styles.actionButton
             ]}>
-          <View style={[{ flex: 1, flexDirection: 'row', justifyContent: 'center' }]}>
-            <MaterialCommunityIcons name='octagram' color={'white'} size={20}/>
-            <TextRegular textStyle={styles.text}>
-              Promote
-            </TextRegular>
-          </View>
-        </Pressable>
+            <View style={[{ flex: 1, flexDirection: 'row', justifyContent: 'center' }]}>
+              <MaterialCommunityIcons name='sort' color={'white'} size={20} />
+              <TextRegular textStyle={styles.text}>Sort by: {item.sortByPrice ? 'default' : 'price'}</TextRegular>
+            </View>
+          </Pressable>
 
         </View>
       </ImageCard>
     )
+  }
+
+  // SOLUCION
+  const toggleRestaurantProductsOrder = async (restaurant) => {
+    try {
+      const modifiedRestaurant = await toggleProductsSorting(restaurant.id)
+      if (modifiedRestaurant) {
+        await fetchRestaurants()
+        showMessage({
+          message: `Restaurant ${restaurant.name} succesfully changed sorting method`,
+          type: 'success',
+          style: GlobalStyles.flashStyle,
+          titleStyle: GlobalStyles.flashTextStyle
+        })
+      }
+    } catch (error) {
+      showMessage({
+        message: `There was an error while changing products order of the restaurant ${restaurant.name}. ${error.message}`,
+        type: 'error',
+        style: GlobalStyles.flashStyle,
+        titleStyle: GlobalStyles.flashTextStyle
+      })
+    }
   }
 
   // SOLUCION
@@ -263,7 +277,7 @@ const styles = StyleSheet.create({
     padding: 10,
     alignSelf: 'center',
     flexDirection: 'column',
-    width: '33%' // SOLUCION
+    width: '33%' // solucion
   },
   actionButtonsContainer: {
     flexDirection: 'row',
