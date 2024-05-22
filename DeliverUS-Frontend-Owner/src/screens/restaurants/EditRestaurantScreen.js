@@ -22,7 +22,8 @@ export default function EditRestaurantScreen ({ navigation, route }) {
   const [backendErrors, setBackendErrors] = useState()
   const [restaurant, setRestaurant] = useState({})
 
-  const [initialRestaurantValues, setInitialRestaurantValues] = useState({ name: null, description: null, address: null, postalCode: null, url: null, shippingCosts: null, email: null, phone: null, restaurantCategoryId: null, logo: null, heroImage: null })
+  // SOLUCION
+  const [initialRestaurantValues, setInitialRestaurantValues] = useState({ name: null, description: null, address: null, postalCode: null, url: null, shippingCosts: null, email: null, phone: null, restaurantCategoryId: null, logo: null, heroImage: null, discountCode: null, discount: null })
   const validationSchema = yup.object().shape({
     name: yup
       .string()
@@ -56,7 +57,17 @@ export default function EditRestaurantScreen ({ navigation, route }) {
       .number()
       .positive()
       .integer()
-      .required('Restaurant category is required')
+      .required('Restaurant category is required'),
+    // SOLUCION
+    discountCode: yup
+      .string()
+      .nullable()
+      .max(10, 'Discount code too long'),
+    discount: yup
+      .number()
+      .nullable()
+      .min(1)
+      .max(99)
   })
 
   useEffect(() => {
@@ -185,6 +196,15 @@ export default function EditRestaurantScreen ({ navigation, route }) {
               <InputItem
                 name='phone'
                 label='Phone:'
+              />
+              { /* SOLUCION */ }
+              <InputItem
+                name='discountCode'
+                label='Discount Code:'
+              />
+              <InputItem
+                name='discount'
+                label='Discount:'
               />
 
               <DropDownPicker

@@ -69,6 +69,16 @@ const loadModel = (sequelize, DataTypes) => {
       type: DataTypes.BOOLEAN,
       defaultValue: false
     },
+    // SOLUCION
+    discountCode: {
+      // un campo en la base de datos puede aceptar valores nulos
+      allowNull: true,
+      type: DataTypes.STRING
+    },
+    discount: {
+      allowNull: true,
+      type: DataTypes.DOUBLE
+    },
     restaurantCategoryId: {
       allowNull: false,
       type: DataTypes.INTEGER
