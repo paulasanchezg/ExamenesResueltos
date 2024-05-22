@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Image, Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native'
+import { Image, Platform, Pressable, ScrollView, StyleSheet, View, Switch } from 'react-native'
 import * as ExpoImagePicker from 'expo-image-picker'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 import * as yup from 'yup'
@@ -20,7 +20,7 @@ export default function CreateRestaurantScreen ({ navigation, route }) {
   const [restaurantCategories, setRestaurantCategories] = useState([])
   const [backendErrors, setBackendErrors] = useState()
 
-  const initialRestaurantValues = { name: null, description: null, address: null, postalCode: null, url: null, shippingCosts: null, email: null, phone: null, restaurantCategoryId: null }
+  const initialRestaurantValues = { name: null, description: null, address: null, postalCode: null, url: null, shippingCosts: null, email: null, phone: null, restaurantCategoryId: null, promoted: false }
   const validationSchema = yup.object().shape({
     name: yup
       .string()
@@ -211,6 +211,19 @@ export default function CreateRestaurantScreen ({ navigation, route }) {
                 <Image style={styles.image} source={values.logo ? { uri: values.logo.assets[0].uri } : restaurantLogo} />
               </Pressable>
 
+              {/* SOLUCION */}
+              {backendErrors &&
+                backendErrors.map((error, index) => <TextError key={index}>{error.param}-{error.msg}</TextError>)
+              }
+              <TextRegular>Is it promoted?</TextRegular>
+              <Switch
+                trackColor={{ false: GlobalStyles.brandSecondary, true: GlobalStyles.brandPrimary }}
+                thumbColor={values.promoted ? GlobalStyles.brandSecondary : '#f4f3f4'}
+                value={values.promoted}
+                style={styles.switch}
+                onValueChange={value => setFieldValue('promoted', value)}
+              />
+
               <Pressable onPress={() =>
                 pickImage(
                   async result => {
@@ -280,5 +293,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     alignSelf: 'center',
     marginTop: 5
-  }
+  },
+  switch: {
+    marginTop: 5
+  } // SOLUCION
 })
