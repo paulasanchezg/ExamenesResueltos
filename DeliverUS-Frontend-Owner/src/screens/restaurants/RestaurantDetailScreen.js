@@ -54,18 +54,69 @@ export default function RestaurantDetailScreen ({ navigation, route }) {
     )
   }
 
+  // BEGIN SOLUTION
+  const renderCardTitle = (item) => {
+    return (<>
+      <TextSemiBold style={{ fontSize: 15 }}>{item.name}</TextSemiBold>
+      {restaurant.discountPercentage > 0 && item.promoted && <TextSemiBold style={{ marginLeft: 5, fontSize: 15, color: GlobalStyles.brandPrimary }}>({restaurant.discountPercentage}% off)</TextSemiBold>}
+    </>)
+  }
+    // END SOLUTION
+
   const renderProduct = ({ item }) => {
     return (
       <ImageCard
         imageUri={item.image ? { uri: process.env.API_BASE_URL + '/' + item.image } : defaultProductImage}
-        title={item.name}
+        //BEGIN SOLUTION
+        title={renderCardTitle(item)}
+      //END SOLUTION
       >
         <TextRegular numberOfLines={2}>{item.description}</TextRegular>
-        <TextSemiBold textStyle={styles.price}>{item.price.toFixed(2)}€</TextSemiBold>
+
+      {/* BEGIN SOLUTION */}
+        {/* Shows de promoted price */}
+        <View flexDirection='row'>
+          <TextSemiBold textStyle={styles.price}>{item.price.toFixed(2)}€
+          { /*se comprueba si el porcentaje de descuento del restaurante es mayor que 0 y si el producto
+          está promocionado. Si ambas son verdaderas, se muestra un texto adicional con el precio promocionado. 
+          Este precio se calcula aplicando el descuento (item.price * (1 - restaurant.discountPercentage / 100)) 
+          y también se formatea con dos decimales*/}
+            {restaurant.discountPercentage > 0 && item.promoted && <TextSemiBold style={styles.pricePromoted}>{"Price promoted: " + (item.price * (1 - restaurant.discountPercentage / 100)).toFixed(2)}€</TextSemiBold>}
+          </TextSemiBold>
+        </View>
+        {/* END SOLUTION */}
+
         {!item.availability &&
           <TextRegular textStyle={styles.availability }>Not available</TextRegular>
         }
          <View style={styles.actionButtonsContainer}>
+           {/* BEGIN SOLUTION 
+            En caso de que el porcentaje de descuento asociado con el restaurante sea mayor que 0, 
+            se muestra un botón que permite promocionar o despromocionar el producto. 
+            De lo contrario, no se mostrará el botón.
+          */
+
+            restaurant.discountPercentage > 0 &&
+            <Pressable
+              onPress={() => { promoteProduct(item) }}
+              style={({ pressed }) => [
+                {
+                  backgroundColor: pressed
+                    ? GlobalStyles.brandSuccessTap
+                    : GlobalStyles.brandSuccess
+                },
+                styles.actionButton
+              ]}>
+              <View style={[{ flex: 1, flexDirection: 'row', justifyContent: 'center' }]}>
+                <MaterialCommunityIcons name={item.promoted ? 'star' : 'star-outline'} color={'white'} size={20} />
+                <TextRegular textStyle={styles.text}>
+                  {item.promoted && "Demote"}
+                  {!item.promoted && "Promote"}
+                </TextRegular>
+              </View>
+            </Pressable>
+          /* END SOLUTION */}
+
           <Pressable
             onPress={() => navigation.navigate('EditProductScreen', { id: item.id })
             }
@@ -106,6 +157,32 @@ export default function RestaurantDetailScreen ({ navigation, route }) {
       </ImageCard>
     )
   }
+
+  // BEGIN SOLUTION
+  // Promotes or demotes a product calling to proper endpoint on the REST API.
+  const promoteProduct = async (product) => {
+    try {
+      await promote(product.id)
+      await fetchRestaurantDetail()
+      // Optional
+      showMessage({
+        message: `Product ${product.name} succesfully promoted`,
+        type: 'success',
+        style: GlobalStyles.flashStyle,
+        titleStyle: GlobalStyles.flashTextStyle
+      })
+    } catch (error) {
+      console.log(error)
+      // Optional
+      showMessage({
+        message: `Product ${product.name} could not be promoted.`,
+        type: 'error',
+        style: GlobalStyles.flashStyle,
+        titleStyle: GlobalStyles.flashTextStyle
+      })
+    }
+  }
+  // END SOLUTION
 
   const renderEmptyProductsList = () => {
     return (
@@ -216,7 +293,7 @@ const styles = StyleSheet.create({
     padding: 10,
     alignSelf: 'center',
     flexDirection: 'row',
-    width: '80%'
+    width: '33%' // SOLUCION
   },
   text: {
     fontSize: 16,
@@ -244,5 +321,11 @@ const styles = StyleSheet.create({
     bottom: 5,
     position: 'absolute',
     width: '90%'
+  },
+  // BEGIN SOLUTION
+  pricePromoted: {
+    marginLeft: 10,
+    color: GlobalStyles.brandPrimary,
   }
+  // END SOLUTION
 })

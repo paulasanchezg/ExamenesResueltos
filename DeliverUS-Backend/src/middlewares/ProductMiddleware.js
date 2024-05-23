@@ -1,4 +1,19 @@
 import { Order, Product, Restaurant } from '../models/models.js'
+
+//BEGIN SOLUTION
+checkRestaurantDiscount: async (req, res, next) => {
+  try {
+    const product = await Product.findByPk(req.params.productId, { include: { model: Restaurant, as: 'restaurant' } })
+    if (product.restaurant.discountPercentage > 0) { // Comprueba si el restaurante asociado al producto tiene un descuento activo
+      return next()
+    } else {
+      return res.status(403).send('Not enough discount. This restaurant is not promoted')
+    }
+  } catch (err) {
+    return res.status(500).send(err)
+  }
+}
+
 const checkProductOwnership = async (req, res, next) => {
   try {
     const product = await Product.findByPk(req.params.productId, { include: { model: Restaurant, as: 'restaurant' } })

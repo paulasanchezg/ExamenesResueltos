@@ -79,6 +79,11 @@ const loadModel = (sequelize, DataTypes) => {
       allowNull: true,
       type: DataTypes.DOUBLE
     },
+    // SOLUCION
+    discountPercentage: {
+      type: DataTypes.INTEGER,
+      defaultValue: 0
+    },
     restaurantCategoryId: {
       allowNull: false,
       type: DataTypes.INTEGER

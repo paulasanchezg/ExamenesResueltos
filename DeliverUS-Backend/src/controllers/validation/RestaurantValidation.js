@@ -76,6 +76,9 @@ const create = [
       return checkBussinessRuleOneRestaurantPromotedByOwner(req.user.id, value)
     })
     .withMessage('You can only promote one restaurant at a time'),
+  // BEGIN SOLUTION
+  // Check generic validations for discount percentage.
+  check('discountPercentage').exists().isInt({ min: 0, max: 100 }).toInt(),
   check('heroImage').custom((value, { req }) => {
     return checkFileIsImage(req, 'heroImage')
   }).withMessage('Please upload an image with format (jpeg, png).'),
@@ -115,6 +118,9 @@ const update = [
       return checkBussinessRuleOneRestaurantPromotedByOwner(req.user.id, value)
     })
     .withMessage('You can only promote one restaurant at a time'),
+  // BEGIN SOLUTION
+  // Check generic validations for discount percentage.
+  check('discountPercentage').exists().isInt({ min: 0, max: 100 }).toInt(),
   check('heroImage').custom((value, { req }) => {
     return checkFileIsImage(req, 'heroImage')
   }).withMessage('Please upload an image with format (jpeg, png).'),

@@ -23,7 +23,9 @@ export default function EditRestaurantScreen ({ navigation, route }) {
   const [restaurant, setRestaurant] = useState({})
 
   // SOLUCION
-  const [initialRestaurantValues, setInitialRestaurantValues] = useState({ name: null, description: null, address: null, postalCode: null, url: null, shippingCosts: null, email: null, phone: null, restaurantCategoryId: null, logo: null, heroImage: null, discountCode: null, discount: null })
+  // BEGIN SOLUTION
+// Added initial value for discountPercentage property
+const [initialRestaurantValues, setInitialRestaurantValues] = useState({ name: null, description: null, address: null, postalCode: null, url: null, shippingCosts: null, email: null, phone: null, restaurantCategoryId: null, logo: null, heroImage: null, promoted: false, discountCode: null, discount: null, discountPercentage: 0.0 })
   const validationSchema = yup.object().shape({
     name: yup
       .string()
@@ -67,7 +69,15 @@ export default function EditRestaurantScreen ({ navigation, route }) {
       .number()
       .nullable()
       .min(1)
-      .max(99)
+      .max(99),
+    // BEGIN SOLUTION
+    discountPercentage: yup
+      .number()
+      .positive()
+      .integer()
+      .max(100, 'Discount percentage must be a float between 0 and 100')
+      .min(0, 'Discount percentage must be a float between 0 and 100')
+    // END SOLUTION
   })
 
   useEffect(() => {
@@ -196,6 +206,14 @@ export default function EditRestaurantScreen ({ navigation, route }) {
               <InputItem
                 name='phone'
                 label='Phone:'
+              />
+
+              {/* BEGIN SOLUTION
+                  Shows the components necessary to adjust the discount percentage properties.
+              */}
+              <InputItem
+                name='discountPercentage'
+                label='Discount percentage:'
               />
 
               <DropDownPicker

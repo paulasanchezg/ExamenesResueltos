@@ -78,6 +78,11 @@ module.exports = {
         min: 1,
         max: 99
       },
+      // SOLUCION
+      discountPercentage: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

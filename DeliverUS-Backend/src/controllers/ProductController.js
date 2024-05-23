@@ -1,4 +1,4 @@
-import { Product, Order, Restaurant, RestaurantCategory, ProductCategory } from '../models/models.js'
+import { sequelizeSession, Product, Order, Restaurant, RestaurantCategory, ProductCategory } from '../models/models.js'
 import Sequelize from 'sequelize'
 
 const indexRestaurant = async function (req, res) {
@@ -107,12 +107,29 @@ const popular = async function (req, res) {
   }
 }
 
+// SOLUCION
+const promote = async function (req, res) {
+    try {
+      const productToBePromoted = await Product.findByPk(req.params.productId)
+      await Product.update(
+        { promoted: !productToBePromoted.promoted },
+        { where: { id: productToBePromoted.id } } // solo se actualice el producto específico.
+      )
+      const updatedProduct = await Product.findByPk(req.params.productId) // Vuelve a buscar el producto en la base de datos para obtener su estado actualizado
+      res.json(updatedProduct)
+    } catch (err) {
+      res.status(500).send(err)
+    }
+  }
+
+
 const ProductController = {
   indexRestaurant,
   show,
   create,
   update,
   destroy,
-  popular
+  popular, 
+  promote
 }
 export default ProductController
