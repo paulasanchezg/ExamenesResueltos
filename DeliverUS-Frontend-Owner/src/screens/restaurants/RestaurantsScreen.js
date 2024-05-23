@@ -23,6 +23,9 @@ export default function RestaurantsScreen ({ navigation, route }) {
   // SOLUCION 
   const [restaurantToBePromoted, setRestaurantToBePromoted] = useState(null)
 
+  // TODO: Control del refresco del listado
+  const [refresh, setRefresh] = useState(false)
+
   useEffect(() => {
     if (loggedInUser) {
       fetchRestaurants()
@@ -39,6 +42,23 @@ export default function RestaurantsScreen ({ navigation, route }) {
       </>)
   }
 
+  // SOLUCION OCT 
+  // TODO: Llamada a la función principal y control de errores
+  const changeStatus = async (id) => {
+    try {
+      await toggleOnline(id)
+      setRefresh(true)
+    } catch (error) {
+      console.log(error)
+      showMessage({
+        message: `There was an error while trying to toggle status. ${error} `,
+        type: 'error',
+        style: GlobalStyles.flashStyle,
+        titleStyle: GlobalStyles.flashTextStyle
+      })
+    }
+  }
+
   const renderRestaurant = ({ item }) => {
     return (
       <ImageCard
@@ -53,6 +73,12 @@ export default function RestaurantsScreen ({ navigation, route }) {
         {item.averageServiceMinutes !== null &&
           <TextSemiBold>Avg. service time: <TextSemiBold textStyle={{ color: GlobalStyles.brandPrimary }}>{item.averageServiceMinutes} min.</TextSemiBold></TextSemiBold>
         }
+
+        { /* SOLUCION */}
+        { 
+          <TextSemiBold>This restaurant is <TextSemiBold textStyle={{ color: GlobalStyles.brandPrimary }}>{item.status}</TextSemiBold></TextSemiBold>
+        }
+
         <TextSemiBold>Shipping: <TextSemiBold textStyle={{ color: GlobalStyles.brandPrimary }}>{item.shippingCosts.toFixed(2)}€</TextSemiBold></TextSemiBold>
 
         { /* SOLUCION */}
@@ -95,6 +121,29 @@ export default function RestaurantsScreen ({ navigation, route }) {
             </TextRegular>
           </View>
         </Pressable>
+
+        {/* SOLUCION */}
+        { (item.status === 'online' || item.status === 'offline') &&
+        <Pressable
+            onPress={() => {
+              changeStatus(item.id)
+            }}
+            style={({ pressed }) => [
+              {
+                backgroundColor: pressed
+                  ? GlobalStyles.brandSuccessTap
+                  : GlobalStyles.brandSuccessDisabled
+              },
+              styles.actionButton
+            ]}>
+          <View style={[{ flex: 1, flexDirection: 'row', justifyContent: 'center' }]}>
+            <MaterialCommunityIcons name='update' color={'white'} size={20}/>
+            <TextRegular textStyle={styles.text}>
+              {item.status !== 'online' ? 'online' : 'offline'}
+            </TextRegular>
+          </View>
+        </Pressable>
+        }
 
         {/* SOLUCION */}
         <Pressable
@@ -286,7 +335,7 @@ const styles = StyleSheet.create({
     padding: 10,
     alignSelf: 'center',
     flexDirection: 'column',
-    width: '33%' // solucion
+    width: '33%' // Solucion
   },
   actionButtonsContainer: {
     flexDirection: 'row',

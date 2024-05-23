@@ -28,6 +28,8 @@ const indexOwner = async function (req, res) {
         where: { userId: req.user.id },
         // SOLUCION
         order: [['promoted', 'DESC']],
+        // TODO: Orden por estado
+        order: [['status', 'ASC'], ['name', 'ASC']],
         include: [{
           model: RestaurantCategory,
           as: 'restaurantCategory'
@@ -152,6 +154,43 @@ const promote = async function (req, res) {
   }
 }
 
+// SOLUCION OCT
+// cambia el estado de un restaurante entre "online" y "offline" en una base de datos, asegurando que no haya pedidos pendientes antes de realizar el cambio.
+exports.toggleOnline = async function (req, res) {
+  const t = await sequelizeSession.transaction()
+  try {
+    const restaurant = await Restaurant.findByPk(req.params.restaurantId, { transaction: t })
+
+    // Cuenta los pedidos asociados con el restaurante que no han sido entregados (deliveredAt es null). 
+    // La consulta también se realiza dentro de la transacción t y con un bloqueo (lock: true) para evitar condiciones de carrera.
+    const count = await Order.count({
+      where: {
+        restaurantId: req.params.restaurantId,
+        deliveredAt: { [Op.is]: null }
+      }
+    },
+    { lock: true, transaction: t }
+    )
+
+    // Comprueba si el estado actual del restaurante es "online" o "offline" y si no hay pedidos no entregados
+    if ((restaurant.status === 'online' || restaurant.status === 'offline') && count === 0) {
+      // Si ambas condiciones se cumplen, alterna el estado del restaurante entre "online" y "offline".
+      const newStatus = restaurant.status === 'online' ? 'offline' : 'online'
+      await Restaurant.update(
+        { status: newStatus },
+        { where: { id: req.params.restaurantId } },
+        { transaction: t }
+      )
+    }
+    await t.commit()
+    const updatedRestaurant = await Restaurant.findByPk(req.params.restaurantId)
+    res.json(updatedRestaurant)
+  } catch (err) {
+    await t.rollback()
+    res.status(500).send(err)
+  }
+}
+
 
 const RestaurantController = {
   index,
@@ -161,6 +200,7 @@ const RestaurantController = {
   update,
   destroy,
   promote,
-  toggleProductsSorting
+  toggleProductsSorting,
+  toggleOnline
 }
 export default RestaurantController

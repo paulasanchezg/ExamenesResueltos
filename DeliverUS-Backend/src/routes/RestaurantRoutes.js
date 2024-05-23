@@ -80,5 +80,15 @@ const loadFileRoutes = function (app) {
         checkEntityExists(Restaurant, 'restaurantId'),
         RestaurantMiddleware.checkRestaurantOwnership,
         RestaurantController.toggleProductsSorting)
+
+    // SOLUCION
+    // TODO: Ruta al falso toggle.
+    app.route('/restaurants/:restaurantId/toggle-online')
+    .patch(middlewares.isLoggedIn,
+      hasRole('owner'),
+      checkEntityExists(Restaurant, 'restaurantId'),
+      RestaurantMiddleware.checkRestaurantOwnership,
+      RestaurantMiddleware.checkValidStatusChange,
+      RestaurantController.toggleOnline)
 }
 export default loadFileRoutes

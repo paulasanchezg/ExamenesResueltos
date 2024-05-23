@@ -38,4 +38,9 @@ function toggleProductsSorting (id) {
   return patch(`restaurants/${id}/toggleProductsSorting`)
 }
 
-export { getAll, getDetail, getRestaurantCategories, create, update, remove, promote, createCategory, toggleProductsSorting }
+// SOLUCION
+function toggleOnline (id) {
+  return patch(`restaurants/${id}/toggle-online`)
+}
+
+export { getAll, getDetail, getRestaurantCategories, create, update, remove, promote, createCategory, toggleProductsSorting, toggleOnline }
